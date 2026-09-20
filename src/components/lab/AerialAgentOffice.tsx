@@ -32,8 +32,8 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
     pos: THREE.Vector3;
     lookAt: THREE.Vector3;
   }>({
-    pos: new THREE.Vector3(20, 19, 21),
-    lookAt: new THREE.Vector3(0, 1.2, 0),
+    pos: new THREE.Vector3(21, 18, 22),
+    lookAt: new THREE.Vector3(0, 1.4, 0),
   });
 
   const selectedAgent = agents.find((a) => a.id === selectedAgentId);
@@ -43,7 +43,7 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
     if (selectedAgent) {
       const [x, y, z] = selectedAgent.workstationPos;
       cameraTargetRef.current = {
-        pos: new THREE.Vector3(x + 4.8, 6.2, z + 5.8),
+        pos: new THREE.Vector3(x + 4.6, 5.8, z + 5.4),
         lookAt: new THREE.Vector3(x, 1.4, z),
       };
       setIsAutoDrifting(false);
@@ -61,27 +61,27 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
 
     if (preset === "director") {
       cameraTargetRef.current = {
-        pos: new THREE.Vector3(20, 19, 21),
-        lookAt: new THREE.Vector3(0, 1.2, 0),
+        pos: new THREE.Vector3(21, 18, 22),
+        lookAt: new THREE.Vector3(0, 1.4, 0),
       };
     } else if (preset === "orchestrator") {
       cameraTargetRef.current = {
-        pos: new THREE.Vector3(0, 7.5, 9.5),
-        lookAt: new THREE.Vector3(0, 1.6, 0),
+        pos: new THREE.Vector3(0, 6.8, 9.2),
+        lookAt: new THREE.Vector3(0, 1.5, 0),
       };
     } else if (preset === "synthesis") {
       cameraTargetRef.current = {
-        pos: new THREE.Vector3(10.5, 6.8, 1.2),
-        lookAt: new THREE.Vector3(4.8, 1.5, -3.2),
+        pos: new THREE.Vector3(10.2, 6.2, 1.5),
+        lookAt: new THREE.Vector3(5.0, 1.4, -3.0),
       };
     } else if (preset === "qc") {
       cameraTargetRef.current = {
-        pos: new THREE.Vector3(-1.5, 6.2, 11.5),
-        lookAt: new THREE.Vector3(0, 1.6, 5.2),
+        pos: new THREE.Vector3(-1.8, 5.8, 11.2),
+        lookAt: new THREE.Vector3(0, 1.5, 5.2),
       };
     } else if (preset === "plan") {
       cameraTargetRef.current = {
-        pos: new THREE.Vector3(0.01, 30, 0.01),
+        pos: new THREE.Vector3(0.01, 32, 0.01),
         lookAt: new THREE.Vector3(0, 0, 0),
       };
     }
@@ -93,17 +93,17 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
 
     // 1. Scene Setup — Warm Vintage Paper Studio Palette
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf2efe6); // --color-beige-bg warm paper tone
-    scene.fog = new THREE.FogExp2(0xf2efe6, 0.018);
+    scene.background = new THREE.Color(0xf2efe6); // warm landing page background
+    scene.fog = new THREE.FogExp2(0xf2efe6, 0.016);
 
     const width = container.clientWidth;
     const height = container.clientHeight;
-    const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 1000);
     camera.position.copy(cameraTargetRef.current.pos);
     const currentLookAt = cameraTargetRef.current.lookAt.clone();
     camera.lookAt(currentLookAt);
 
-    // 2. Renderer Setup — ACES Filmic Tone Mapping & High-Precision Soft Shadows
+    // 2. High-Precision Physical Renderer
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
@@ -114,120 +114,137 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 1.1;
     container.appendChild(renderer.domElement);
 
     // 3. Cinematic Architectural Lighting Rig
-    // Ambient fill (warm ceiling bounce)
-    const ambientLight = new THREE.AmbientLight(0xfefbf4, 1.25);
+    const ambientLight = new THREE.AmbientLight(0xfffaef, 1.3);
     scene.add(ambientLight);
 
-    // Key studio sun (sharp, high-angle warm sunlight)
-    const keySun = new THREE.DirectionalLight(0xfffaee, 2.0);
-    keySun.position.set(18, 30, 15);
+    // Key studio sunlight (sharp warm sun casting long soft architectural shadows)
+    const keySun = new THREE.DirectionalLight(0xfff5e4, 2.2);
+    keySun.position.set(20, 32, 16);
     keySun.castShadow = true;
     keySun.shadow.mapSize.width = 2048;
     keySun.shadow.mapSize.height = 2048;
     keySun.shadow.camera.near = 1;
-    keySun.shadow.camera.far = 80;
+    keySun.shadow.camera.far = 85;
     keySun.shadow.bias = -0.0002;
-    keySun.shadow.radius = 2.0;
+    keySun.shadow.radius = 2.4;
 
-    const shadowDist = 18;
+    const shadowDist = 20;
     keySun.shadow.camera.left = -shadowDist;
     keySun.shadow.camera.right = shadowDist;
     keySun.shadow.camera.top = shadowDist;
     keySun.shadow.camera.bottom = -shadowDist;
     scene.add(keySun);
 
-    // Cool skylight fill from opposite side
-    const skyFill = new THREE.DirectionalLight(0xdce5ed, 0.7);
-    skyFill.position.set(-16, 20, -14);
+    // Cool architectural skylight fill
+    const skyFill = new THREE.DirectionalLight(0xd9e4ee, 0.75);
+    skyFill.position.set(-18, 22, -16);
     scene.add(skyFill);
 
-    // Warm architectural bounce light from travertine floor
-    const floorBounce = new THREE.DirectionalLight(0xf4ebdd, 0.5);
-    floorBounce.position.set(0, -5, 0);
+    // Warm floor reflection bounce
+    const floorBounce = new THREE.DirectionalLight(0xf5ecde, 0.6);
+    floorBounce.position.set(0, -6, 0);
     scene.add(floorBounce);
 
-    // Center focal amber glow
-    const centerGlow = new THREE.PointLight(0xe57d25, 2.4, 28);
-    centerGlow.position.set(0, 3.8, 0);
-    scene.add(centerGlow);
+    // Central core glowing light
+    const centerPointLight = new THREE.PointLight(0xe57d25, 2.8, 24);
+    centerPointLight.position.set(0, 3.2, 0);
+    scene.add(centerPointLight);
 
-    // 4. Architectural Pavilion Structure
-    // Main circular travertine/limestone podium
-    const platformGeo = new THREE.CylinderGeometry(15.5, 16.2, 0.7, 64);
+    // 4. Architectural Pavilion Platform & Terrazzo Floor
+    const platformGeo = new THREE.CylinderGeometry(16.5, 17.2, 0.8, 64);
     const platformMat = new THREE.MeshStandardMaterial({
-      color: 0xe6e2d6, // Warm travertine stone
-      roughness: 0.88,
-      metalness: 0.05,
+      color: 0xe6e1d4, // Polished warm terrazzo
+      roughness: 0.85,
+      metalness: 0.08,
     });
     const platform = new THREE.Mesh(platformGeo, platformMat);
-    platform.position.y = -0.35;
+    platform.position.y = -0.4;
     platform.receiveShadow = true;
     scene.add(platform);
 
-    // Outer brushed brass inlay rim
-    const brassRingGeo = new THREE.TorusGeometry(15.5, 0.07, 16, 64);
-    const brassRingMat = new THREE.MeshStandardMaterial({
+    // Outer double brass inlay rings
+    const outerBrass1Geo = new THREE.TorusGeometry(16.5, 0.06, 16, 64);
+    const brassMat = new THREE.MeshStandardMaterial({
       color: 0xd4af37,
       metalness: 0.85,
       roughness: 0.25,
     });
-    const brassRing = new THREE.Mesh(brassRingGeo, brassRingMat);
-    brassRing.rotation.x = Math.PI / 2;
-    brassRing.position.y = 0.01;
-    scene.add(brassRing);
+    const outerBrass1 = new THREE.Mesh(outerBrass1Geo, brassMat);
+    outerBrass1.rotation.x = Math.PI / 2;
+    outerBrass1.position.y = 0.01;
+    scene.add(outerBrass1);
 
-    // Multi-tiered sunken central rotunda (amphitheater conversation pit)
+    const outerBrass2Geo = new THREE.TorusGeometry(15.2, 0.03, 16, 64);
+    const outerBrass2 = new THREE.Mesh(outerBrass2Geo, brassMat);
+    outerBrass2.rotation.x = Math.PI / 2;
+    outerBrass2.position.y = 0.01;
+    scene.add(outerBrass2);
+
+    // Sunken Central Conversation Amphitheater (3 stepped tiers)
     const tiers = [
-      { rOuter: 4.8, rInner: 4.6, h: 0.08, col: 0xdfdad0 },
-      { rOuter: 3.8, rInner: 3.6, h: 0.16, col: 0xd8d2c6 },
-      { rOuter: 2.8, rInner: 2.6, h: 0.24, col: 0xd0c9bc },
+      { rOuter: 5.2, rInner: 5.0, h: 0.1, col: 0xdcd7cb },
+      { rOuter: 4.1, rInner: 3.9, h: 0.2, col: 0xd4cfc2 },
+      { rOuter: 3.0, rInner: 2.8, h: 0.3, col: 0xcbc5b8 },
     ];
 
     tiers.forEach((t) => {
-      const ringGeo = new THREE.RingGeometry(t.rInner, t.rOuter, 48);
-      const ringMat = new THREE.MeshStandardMaterial({
-        color: 0xd4af37,
-        metalness: 0.8,
-        roughness: 0.3,
-        side: THREE.DoubleSide,
-      });
-      const rimMesh = new THREE.Mesh(ringGeo, ringMat);
+      const rimGeo = new THREE.RingGeometry(t.rInner, t.rOuter, 48);
+      const rimMesh = new THREE.Mesh(rimGeo, brassMat);
       rimMesh.rotation.x = -Math.PI / 2;
       rimMesh.position.y = 0.02;
       scene.add(rimMesh);
 
       const stepGeo = new THREE.CylinderGeometry(t.rOuter, t.rOuter, t.h, 48);
-      const stepMat = new THREE.MeshStandardMaterial({
-        color: t.col,
-        roughness: 0.85,
-      });
+      const stepMat = new THREE.MeshStandardMaterial({ color: t.col, roughness: 0.85 });
       const step = new THREE.Mesh(stepGeo, stepMat);
       step.position.y = -t.h / 2;
       step.receiveShadow = true;
       scene.add(step);
     });
 
-    // Colonnade of Architectural Louvers / Fins (casting rhythmic cinema shadows)
+    // Radial Brass Inlaid Floor Conduits
+    const radialGroup = new THREE.Group();
+    agents.forEach((ag) => {
+      const [ax, , az] = ag.workstationPos;
+      const start = new THREE.Vector3(0, 0.015, 0);
+      const end = new THREE.Vector3(ax, 0.015, az);
+      const dist = start.distanceTo(end);
+
+      const conduitGeo = new THREE.PlaneGeometry(0.14, dist);
+      const conduit = new THREE.Mesh(conduitGeo, brassMat);
+      conduit.position.set((start.x + end.x) / 2, 0.016, (start.z + end.z) / 2);
+      conduit.rotation.x = -Math.PI / 2;
+      conduit.rotation.z = -Math.atan2(end.x - start.x, end.z - start.z);
+      radialGroup.add(conduit);
+    });
+    scene.add(radialGroup);
+
+    // Architectural Drafting Grid Overlay
+    const grid = new THREE.GridHelper(32, 32, 0xc7c1b3, 0xe0dcd1);
+    grid.position.y = 0.012;
+    scene.add(grid);
+
+    // Perimeter Colonnade of Architectural Vertical Louvers
     const louverGroup = new THREE.Group();
-    const louverCount = 14;
-    const louverArcRadius = 15.2;
-    const louverGeo = new THREE.BoxGeometry(0.3, 5.5, 1.2);
+    const louverCount = 16;
+    const louverRadius = 16.2;
+    const louverGeo = new THREE.BoxGeometry(0.35, 6.0, 1.4);
     const louverMat = new THREE.MeshStandardMaterial({
-      color: 0xded9cc,
+      color: 0xd9d4c6,
       roughness: 0.82,
       metalness: 0.08,
     });
 
     for (let i = 0; i < louverCount; i++) {
-      const angle = (Math.PI * 0.75) + (i / (louverCount - 1)) * (Math.PI * 0.9);
-      const lx = Math.cos(angle) * louverArcRadius;
-      const lz = Math.sin(angle) * louverArcRadius;
+      const angle = Math.PI * 0.7 + (i / (louverCount - 1)) * (Math.PI * 0.95);
+      const lx = Math.cos(angle) * louverRadius;
+      const lz = Math.sin(angle) * louverRadius;
       const louver = new THREE.Mesh(louverGeo, louverMat);
-      louver.position.set(lx, 2.75, lz);
+      louver.position.set(lx, 3.0, lz);
       louver.rotation.y = -angle + Math.PI / 4;
       louver.castShadow = true;
       louver.receiveShadow = true;
@@ -235,139 +252,145 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
     }
     scene.add(louverGroup);
 
-    // Architectural Technical Drafting Grid Lines
-    const grid = new THREE.GridHelper(30, 30, 0xc8c3b5, 0xe2ded3);
-    grid.position.y = 0.012;
-    scene.add(grid);
+    // 5. Central Holographic Science Reactor & Molecular Oculus
+    const centralReactor = new THREE.Group();
+    centralReactor.position.set(0, 0, 0);
 
-    // Inlaid concentric drafting arcs & rings
-    const coreRingGeo = new THREE.RingGeometry(2.7, 2.82, 64);
-    const coreRingMat = new THREE.MeshBasicMaterial({
-      color: 0xe57d25,
-      side: THREE.DoubleSide,
+    // Base cylindrical plinth with glowing recessed slit
+    const reactorBaseGeo = new THREE.CylinderGeometry(2.0, 2.3, 0.45, 48);
+    const reactorBaseMat = new THREE.MeshStandardMaterial({ color: 0x222529, roughness: 0.35, metalness: 0.6 });
+    const reactorBase = new THREE.Mesh(reactorBaseGeo, reactorBaseMat);
+    reactorBase.position.y = 0.22;
+    reactorBase.castShadow = true;
+    reactorBase.receiveShadow = true;
+    centralReactor.add(reactorBase);
+
+    // Glowing core ring on plinth
+    const coreSlitGeo = new THREE.CylinderGeometry(1.85, 1.85, 0.08, 48);
+    const coreSlitMat = new THREE.MeshBasicMaterial({ color: 0xe57d25 });
+    const coreSlit = new THREE.Mesh(coreSlitGeo, coreSlitMat);
+    coreSlit.position.y = 0.46;
+    centralReactor.add(coreSlit);
+
+    // Translucent laboratory glass containment cylinder
+    const glassContainGeo = new THREE.CylinderGeometry(1.7, 1.7, 3.4, 32, 1, true);
+    const glassContainMat = new THREE.MeshPhysicalMaterial({
+      color: 0xf5f3ea,
+      transmission: 0.88,
+      opacity: 0.75,
       transparent: true,
-      opacity: 0.65,
+      roughness: 0.15,
+      ior: 1.5,
     });
-    const coreRing = new THREE.Mesh(coreRingGeo, coreRingMat);
-    coreRing.rotation.x = -Math.PI / 2;
-    coreRing.position.y = 0.025;
-    scene.add(coreRing);
+    const glassContain = new THREE.Mesh(glassContainGeo, glassContainMat);
+    glassContain.position.y = 2.2;
+    centralReactor.add(glassContain);
 
-    const outerRingGeo = new THREE.RingGeometry(9.4, 9.48, 64);
-    const outerRingMat = new THREE.MeshBasicMaterial({
-      color: 0xa8a395,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.45,
-    });
-    const outerRing = new THREE.Mesh(outerRingGeo, outerRingMat);
-    outerRing.rotation.x = -Math.PI / 2;
-    outerRing.position.y = 0.025;
-    scene.add(outerRing);
+    // Brass top cap collar for reactor
+    const topCapGeo = new THREE.CylinderGeometry(1.8, 1.75, 0.2, 32);
+    const topCap = new THREE.Mesh(topCapGeo, brassMat);
+    topCap.position.y = 3.95;
+    centralReactor.add(topCap);
 
-    // Radial Brass Inlaid Conduits from Center to Each Agent
-    const radialConduitsGroup = new THREE.Group();
-    agents.forEach((ag) => {
-      const [ax, , az] = ag.workstationPos;
-      const start = new THREE.Vector3(0, 0.015, 0);
-      const end = new THREE.Vector3(ax, 0.015, az);
-      const dist = start.distanceTo(end);
+    // Inside Containment: Floating Geodesic Carbon Buckyball Core
+    const molecularCoreGroup = new THREE.Group();
+    molecularCoreGroup.position.set(0, 2.2, 0);
 
-      const conduitGeo = new THREE.PlaneGeometry(0.12, dist);
-      const conduitMat = new THREE.MeshStandardMaterial({
-        color: 0xd4af37,
-        metalness: 0.8,
-        roughness: 0.3,
-        side: THREE.DoubleSide,
-      });
-      const conduit = new THREE.Mesh(conduitGeo, conduitMat);
-      conduit.position.set((start.x + end.x) / 2, 0.016, (start.z + end.z) / 2);
-      conduit.rotation.x = -Math.PI / 2;
-      conduit.rotation.z = -Math.atan2(end.x - start.x, end.z - start.z);
-      radialConduitsGroup.add(conduit);
-    });
-    scene.add(radialConduitsGroup);
-
-    // Central Floating Holographic Chemical Apparatus (Geodesic Molecule Lattice)
-    const centralHoloGroup = new THREE.Group();
-    centralHoloGroup.position.set(0, 3.8, 0);
-
-    // 1. Fullerene geodesic cage
-    const cageGeo = new THREE.IcosahedronGeometry(1.6, 1);
-    const cageMat = new THREE.MeshStandardMaterial({
+    // Buckyball wireframe cage
+    const buckyGeo = new THREE.IcosahedronGeometry(1.0, 1);
+    const buckyMat = new THREE.MeshStandardMaterial({
       color: 0xe57d25,
       wireframe: true,
       emissive: 0xe57d25,
-      emissiveIntensity: 0.4,
+      emissiveIntensity: 0.7,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.8,
     });
-    const cageMesh = new THREE.Mesh(cageGeo, cageMat);
-    centralHoloGroup.add(cageMesh);
+    const buckyMesh = new THREE.Mesh(buckyGeo, buckyMat);
+    molecularCoreGroup.add(buckyMesh);
 
-    // 2. Inner core octahedron
-    const innerCoreGeo = new THREE.OctahedronGeometry(0.85);
-    const innerCoreMat = new THREE.MeshStandardMaterial({
+    // Intricate atom spheres at vertices
+    const atomGeo = new THREE.SphereGeometry(0.08, 12, 12);
+    const atomOrangeMat = new THREE.MeshStandardMaterial({
+      color: 0xe57d25,
+      emissive: 0xe57d25,
+      emissiveIntensity: 0.8,
+    });
+    const atomBlueMat = new THREE.MeshStandardMaterial({
       color: 0x0254ec,
       emissive: 0x0254ec,
-      emissiveIntensity: 0.6,
-      roughness: 0.2,
+      emissiveIntensity: 0.8,
+    });
+
+    const posAttr = buckyGeo.attributes.position;
+    for (let i = 0; i < posAttr.count; i++) {
+      const atom = new THREE.Mesh(atomGeo, i % 2 === 0 ? atomOrangeMat : atomBlueMat);
+      atom.position.set(posAttr.getX(i), posAttr.getY(i), posAttr.getZ(i));
+      molecularCoreGroup.add(atom);
+    }
+
+    // Inner glowing octahedral nucleus
+    const nucleusGeo = new THREE.OctahedronGeometry(0.48);
+    const nucleusMat = new THREE.MeshStandardMaterial({
+      color: 0x0254ec,
+      emissive: 0x0254ec,
+      emissiveIntensity: 0.9,
+      roughness: 0.1,
       metalness: 0.8,
     });
-    const innerCoreMesh = new THREE.Mesh(innerCoreGeo, innerCoreMat);
-    centralHoloGroup.add(innerCoreMesh);
+    const nucleusMesh = new THREE.Mesh(nucleusGeo, nucleusMat);
+    molecularCoreGroup.add(nucleusMesh);
 
-    // 3. Orbital atom electron rings
-    const ring1Geo = new THREE.TorusGeometry(2.1, 0.02, 16, 64);
-    const ring1Mat = new THREE.MeshBasicMaterial({ color: 0xe57d25, transparent: true, opacity: 0.75 });
-    const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
-    ring1.rotation.x = Math.PI / 3;
-    centralHoloGroup.add(ring1);
+    // Triple concentric gyroscopic gimbal rings
+    const gyro1Geo = new THREE.TorusGeometry(1.35, 0.022, 16, 48);
+    const gyro1 = new THREE.Mesh(gyro1Geo, brassMat);
+    gyro1.rotation.x = Math.PI / 4;
+    molecularCoreGroup.add(gyro1);
 
-    const ring2Geo = new THREE.TorusGeometry(2.1, 0.02, 16, 64);
-    const ring2Mat = new THREE.MeshBasicMaterial({ color: 0x0254ec, transparent: true, opacity: 0.65 });
-    const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
-    ring2.rotation.y = Math.PI / 3;
-    centralHoloGroup.add(ring2);
+    const gyro2Geo = new THREE.TorusGeometry(1.48, 0.022, 16, 48);
+    const gyro2 = new THREE.Mesh(gyro2Geo, brassMat);
+    gyro2.rotation.y = Math.PI / 3;
+    molecularCoreGroup.add(gyro2);
 
-    scene.add(centralHoloGroup);
+    centralReactor.add(molecularCoreGroup);
+    scene.add(centralReactor);
 
-    // 5. Cinematic Atmospheric Golden Dust Motes
-    const particleCount = 130;
+    // 6. Atmospheric Golden Dust Motes
+    const particleCount = 140;
     const particleGeo = new THREE.BufferGeometry();
     const particlePositions = new Float32Array(particleCount * 3);
     const particleSpeeds = new Float32Array(particleCount * 3);
 
     for (let i = 0; i < particleCount; i++) {
-      particlePositions[i * 3] = (Math.random() - 0.5) * 26;
-      particlePositions[i * 3 + 1] = Math.random() * 9 + 0.5;
-      particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 26;
+      particlePositions[i * 3] = (Math.random() - 0.5) * 28;
+      particlePositions[i * 3 + 1] = Math.random() * 10 + 0.5;
+      particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 28;
 
-      particleSpeeds[i * 3] = (Math.random() - 0.5) * 0.005;
-      particleSpeeds[i * 3 + 1] = Math.random() * 0.008 + 0.002;
-      particleSpeeds[i * 3 + 2] = (Math.random() - 0.5) * 0.005;
+      particleSpeeds[i * 3] = (Math.random() - 0.5) * 0.006;
+      particleSpeeds[i * 3 + 1] = Math.random() * 0.007 + 0.002;
+      particleSpeeds[i * 3 + 2] = (Math.random() - 0.5) * 0.006;
     }
     particleGeo.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
 
     const particleMat = new THREE.PointsMaterial({
-      color: 0xffe2b8,
-      size: 0.12,
+      color: 0xffdfb0,
+      size: 0.13,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.7,
       blending: THREE.AdditiveBlending,
     });
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
 
-    // 6. Sculptural Agent Workstations (Dieter Rams Minimalist Architectural Furniture)
+    // 7. Architectural Agent Workstations with High-Detail Furniture
     const agentMeshes: {
       group: THREE.Group;
       agent: Agent;
-      beaconMesh: THREE.Mesh;
-      haloMesh: THREE.Mesh;
-      deskLampLight: THREE.SpotLight;
+      avatarMesh: THREE.Mesh;
+      hudRingMesh: THREE.Mesh;
       pointLight: THREE.PointLight;
       deskRimMesh: THREE.Mesh;
+      screenMesh: THREE.Mesh;
     }[] = [];
 
     const interactiveObjects: THREE.Object3D[] = [];
@@ -376,181 +399,252 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
       const group = new THREE.Group();
       group.position.set(ag.workstationPos[0], ag.workstationPos[1], ag.workstationPos[2]);
 
-      // Calculate orientation facing central rotunda (0, 0, 0)
+      // Orient workstation toward central reactor (0, 0, 0)
       const angleToCenter = Math.atan2(-ag.workstationPos[0], -ag.workstationPos[2]);
       group.rotation.y = angleToCenter;
 
-      // Solid Travertine Pedestal Base
-      const baseGeo = new THREE.CylinderGeometry(1.4, 1.55, 0.45, 32);
-      const baseMat = new THREE.MeshStandardMaterial({
-        color: 0xdcd7ca,
+      // Travertine Platform Pedestal
+      const pedGeo = new THREE.CylinderGeometry(1.6, 1.75, 0.45, 32);
+      const pedMat = new THREE.MeshStandardMaterial({
+        color: 0xd9d4c7,
         roughness: 0.8,
         metalness: 0.08,
       });
-      const base = new THREE.Mesh(baseGeo, baseMat);
-      base.position.y = 0.22;
-      base.castShadow = true;
-      base.receiveShadow = true;
-      group.add(base);
+      const pedestal = new THREE.Mesh(pedGeo, pedMat);
+      pedestal.position.y = 0.22;
+      pedestal.castShadow = true;
+      pedestal.receiveShadow = true;
+      group.add(pedestal);
 
-      // Inlaid Pedestal Brass Trim Ring
-      const rimGeo = new THREE.TorusGeometry(1.42, 0.025, 16, 32);
-      const rimMat = new THREE.MeshStandardMaterial({
-        color: 0xd4af37,
-        metalness: 0.8,
-        roughness: 0.3,
-      });
-      const rim = new THREE.Mesh(rimGeo, rimMat);
-      rim.rotation.x = Math.PI / 2;
-      rim.position.y = 0.45;
-      group.add(rim);
+      // Inlaid Brass Trim Ring on Pedestal
+      const pedRimGeo = new THREE.TorusGeometry(1.62, 0.025, 16, 32);
+      const pedRim = new THREE.Mesh(pedRimGeo, brassMat);
+      pedRim.rotation.x = Math.PI / 2;
+      pedRim.position.y = 0.45;
+      group.add(pedRim);
 
-      // Cantilevered Architectural Desk in Deep Charcoal Matte
-      const deskTopGeo = new THREE.BoxGeometry(1.8, 0.12, 0.95);
+      // --- Cantilevered Architectural Desk ---
+      const deskTopGeo = new THREE.BoxGeometry(2.0, 0.1, 1.05);
       const deskTopMat = new THREE.MeshStandardMaterial({
-        color: 0x1f2227, // Matte obsidian charcoal
-        roughness: 0.45,
-        metalness: 0.2,
+        color: 0x1d2025, // Deep obsidian charcoal matte
+        roughness: 0.35,
+        metalness: 0.3,
       });
       const deskTop = new THREE.Mesh(deskTopGeo, deskTopMat);
-      deskTop.position.set(0, 0.92, 0.2);
+      deskTop.position.set(0, 0.95, 0.2);
       deskTop.castShadow = true;
       deskTop.receiveShadow = true;
       group.add(deskTop);
 
       // Desk illuminated edge accent strip
-      const edgeStripGeo = new THREE.BoxGeometry(1.82, 0.02, 0.04);
+      const edgeStripGeo = new THREE.BoxGeometry(2.02, 0.025, 0.035);
       const edgeStripMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color(ag.accentColor),
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.85,
       });
       const edgeStrip = new THREE.Mesh(edgeStripGeo, edgeStripMat);
-      edgeStrip.position.set(0, 0.92, -0.28);
+      edgeStrip.position.set(0, 0.95, -0.32);
       group.add(edgeStrip);
 
       // Slender Brushed Bronze Desk Legs
       const legMat = new THREE.MeshStandardMaterial({
-        color: 0x8a7d65,
-        metalness: 0.8,
-        roughness: 0.35,
+        color: 0x9e9076,
+        metalness: 0.85,
+        roughness: 0.3,
       });
-      const legGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.9, 12);
+      const legGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.95, 12);
 
-      const leg1 = new THREE.Mesh(legGeo, legMat);
-      leg1.position.set(0.75, 0.45, 0.55);
-      leg1.castShadow = true;
-      group.add(leg1);
+      const legPositions = [
+        [0.85, 0.47, 0.6],
+        [-0.85, 0.47, 0.6],
+        [0.85, 0.47, -0.2],
+        [-0.85, 0.47, -0.2],
+      ];
+      legPositions.forEach(([lx, ly, lz]) => {
+        const leg = new THREE.Mesh(legGeo, legMat);
+        leg.position.set(lx, ly, lz);
+        leg.castShadow = true;
+        group.add(leg);
+      });
 
-      const leg2 = new THREE.Mesh(legGeo, legMat);
-      leg2.position.set(-0.75, 0.45, 0.55);
-      leg2.castShadow = true;
-      group.add(leg2);
+      // --- High-End Ergonomic Executive Studio Chair ---
+      const chairGroup = new THREE.Group();
+      chairGroup.position.set(0, 0.45, 1.05); // positioned behind the desk facing console
 
-      const leg3 = new THREE.Mesh(legGeo, legMat);
-      leg3.position.set(0.75, 0.45, -0.15);
-      leg3.castShadow = true;
-      group.add(leg3);
+      // Chair 5-star star caster base
+      const chairBaseGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.04, 5);
+      const chairBase = new THREE.Mesh(chairBaseGeo, brassMat);
+      chairGroup.add(chairBase);
 
-      const leg4 = new THREE.Mesh(legGeo, legMat);
-      leg4.position.set(-0.75, 0.45, -0.15);
-      leg4.castShadow = true;
-      group.add(leg4);
+      const chairPistonGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.35, 12);
+      const chairPiston = new THREE.Mesh(chairPistonGeo, brassMat);
+      chairPiston.position.y = 0.2;
+      chairGroup.add(chairPiston);
 
-      // Curved Brass Gooseneck Desk Lamp with downward pool light
+      // Curved leather/fabric seat cushion
+      const seatGeo = new THREE.BoxGeometry(0.65, 0.08, 0.6);
+      const seatMat = new THREE.MeshStandardMaterial({ color: 0x222529, roughness: 0.65 });
+      const seat = new THREE.Mesh(seatGeo, seatMat);
+      seat.position.y = 0.4;
+      seat.castShadow = true;
+      chairGroup.add(seat);
+
+      // Ergonomic curved backrest with polished brass spine
+      const backGeo = new THREE.BoxGeometry(0.62, 0.65, 0.06);
+      const back = new THREE.Mesh(backGeo, seatMat);
+      back.position.set(0, 0.72, 0.28);
+      back.rotation.x = 0.12;
+      back.castShadow = true;
+      chairGroup.add(back);
+
+      const spineGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.6, 8);
+      const spine = new THREE.Mesh(spineGeo, brassMat);
+      spine.position.set(0, 0.65, 0.32);
+      chairGroup.add(spine);
+
+      group.add(chairGroup);
+
+      // --- Next-Gen Curved Ultra-Wide Terminal Display ---
+      const screenStandGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.3, 8);
+      const screenStand = new THREE.Mesh(screenStandGeo, brassMat);
+      screenStand.position.set(0, 1.15, 0.42);
+      group.add(screenStand);
+
+      // Ultra-wide curved screen
+      const screenGeo = new THREE.BoxGeometry(1.4, 0.55, 0.035);
+      const screenMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(ag.color),
+        emissive: new THREE.Color(ag.color),
+        emissiveIntensity: 0.6,
+        roughness: 0.25,
+      });
+      const screen = new THREE.Mesh(screenGeo, screenMat);
+      screen.position.set(0, 1.35, 0.38);
+      screen.rotation.x = -0.15;
+      group.add(screen);
+
+      // Minimalist Mechanical Keyboard on Desk
+      const kbGeo = new THREE.BoxGeometry(0.6, 0.02, 0.22);
+      const kbMat = new THREE.MeshStandardMaterial({ color: 0x30343a, roughness: 0.4, metalness: 0.5 });
+      const kb = new THREE.Mesh(kbGeo, kbMat);
+      kb.position.set(-0.1, 1.01, 0.1);
+      group.add(kb);
+
+      // Circular Precision Dial / Trackpad
+      const dialGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.015, 24);
+      const dial = new THREE.Mesh(dialGeo, brassMat);
+      dial.position.set(0.38, 1.01, 0.1);
+      group.add(dial);
+
+      // --- Role-Specific Scientific Desktop Accessories ---
+      if (ag.role === "RETROSYNTHESIS" || ag.role === "VALIDATION") {
+        // Borosilicate Erlenmeyer flask with glowing reagent
+        const flaskGeo = new THREE.ConeGeometry(0.12, 0.25, 16);
+        const flaskMat = new THREE.MeshPhysicalMaterial({
+          color: 0xffffff,
+          transmission: 0.9,
+          roughness: 0.1,
+          transparent: true,
+          ior: 1.45,
+        });
+        const flask = new THREE.Mesh(flaskGeo, flaskMat);
+        flask.position.set(-0.65, 1.12, 0.2);
+        group.add(flask);
+
+        const liquidGeo = new THREE.ConeGeometry(0.1, 0.14, 16);
+        const liquidMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(ag.accentColor) });
+        const liquid = new THREE.Mesh(liquidGeo, liquidMat);
+        liquid.position.set(-0.65, 1.07, 0.2);
+        group.add(liquid);
+      } else if (ag.role === "RESEARCH" || ag.role === "KNOWLEDGE") {
+        // Stack of research folio archival notebooks
+        const bookMat = new THREE.MeshStandardMaterial({ color: 0xe57d25, roughness: 0.8 });
+        const bookGeo = new THREE.BoxGeometry(0.28, 0.06, 0.38);
+        const book = new THREE.Mesh(bookGeo, bookMat);
+        book.position.set(-0.65, 1.04, 0.2);
+        book.rotation.y = 0.25;
+        group.add(book);
+      }
+
+      // Curved Brass Gooseneck Lamp with Downward Pool Light
       const lampBaseGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.03, 16);
-      const lampBaseMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.2 });
-      const lampBase = new THREE.Mesh(lampBaseGeo, lampBaseMat);
-      lampBase.position.set(0.65, 0.99, 0.45);
+      const lampBase = new THREE.Mesh(lampBaseGeo, brassMat);
+      lampBase.position.set(0.75, 1.01, 0.38);
       group.add(lampBase);
 
-      const lampArmGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.45, 8);
-      const lampArm = new THREE.Mesh(lampArmGeo, lampBaseMat);
-      lampArm.position.set(0.65, 1.22, 0.45);
-      lampArm.rotation.z = -0.25;
+      const lampArmGeo = new THREE.CylinderGeometry(0.014, 0.014, 0.48, 8);
+      const lampArm = new THREE.Mesh(lampArmGeo, brassMat);
+      lampArm.position.set(0.72, 1.26, 0.38);
+      lampArm.rotation.z = -0.28;
       group.add(lampArm);
 
-      const lampHeadGeo = new THREE.ConeGeometry(0.1, 0.14, 16);
-      const lampHead = new THREE.Mesh(lampHeadGeo, lampBaseMat);
-      lampHead.position.set(0.55, 1.42, 0.45);
-      lampHead.rotation.z = Math.PI * 0.75;
+      const lampHeadGeo = new THREE.ConeGeometry(0.09, 0.15, 16);
+      const lampHead = new THREE.Mesh(lampHeadGeo, brassMat);
+      lampHead.position.set(0.6, 1.48, 0.38);
+      lampHead.rotation.z = Math.PI * 0.78;
       group.add(lampHead);
 
-      // Localized spot pool on desk
-      const spotLight = new THREE.SpotLight(0xfffae8, 1.6, 3.5, Math.PI / 4, 0.4, 1.2);
-      spotLight.position.set(0.55, 1.4, 0.45);
-      spotLight.target.position.set(0.2, 0.95, 0.2);
+      const spotLight = new THREE.SpotLight(0xfffaea, 1.8, 4.0, Math.PI / 4, 0.4, 1.2);
+      spotLight.position.set(0.6, 1.46, 0.38);
+      spotLight.target.position.set(0.2, 0.98, 0.1);
       group.add(spotLight);
       group.add(spotLight.target);
 
-      // Translucent Laboratory Workspace Glass Partition
-      const partitionGeo = new THREE.BoxGeometry(1.6, 0.65, 0.03);
-      const partitionMat = new THREE.MeshPhysicalMaterial({
-        color: 0xf5f3ea,
-        transmission: 0.75,
-        opacity: 0.85,
-        transparent: true,
-        roughness: 0.25,
-        ior: 1.45,
-      });
-      const partition = new THREE.Mesh(partitionGeo, partitionMat);
-      partition.position.set(0, 1.35, 0.65);
-      group.add(partition);
-
-      // Sculptural Floating Agent Avatar Hologram
+      // --- Sculptural Kinetic Agent Avatar Hologram ---
       let avatarGeo: THREE.BufferGeometry;
       if (ag.role === "ORCHESTRATOR") {
-        avatarGeo = new THREE.OctahedronGeometry(0.55);
+        avatarGeo = new THREE.OctahedronGeometry(0.58);
       } else if (ag.role === "RETROSYNTHESIS") {
-        avatarGeo = new THREE.IcosahedronGeometry(0.52);
+        avatarGeo = new THREE.IcosahedronGeometry(0.55);
       } else if (ag.role === "RESEARCH") {
-        avatarGeo = new THREE.CylinderGeometry(0.38, 0.38, 0.75, 16);
+        avatarGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.8, 16);
       } else if (ag.role === "VALIDATION") {
-        avatarGeo = new THREE.DodecahedronGeometry(0.5);
+        avatarGeo = new THREE.DodecahedronGeometry(0.52);
       } else if (ag.role === "CRITIC") {
-        avatarGeo = new THREE.TetrahedronGeometry(0.58);
+        avatarGeo = new THREE.TetrahedronGeometry(0.62);
       } else if (ag.role === "ANALYSIS") {
-        avatarGeo = new THREE.TorusGeometry(0.4, 0.16, 16, 32);
+        avatarGeo = new THREE.TorusGeometry(0.42, 0.16, 16, 32);
       } else {
-        avatarGeo = new THREE.TorusKnotGeometry(0.32, 0.1, 48, 12);
+        avatarGeo = new THREE.TorusKnotGeometry(0.34, 0.1, 48, 12);
       }
 
       const avatarMat = new THREE.MeshPhysicalMaterial({
         color: new THREE.Color(ag.color),
         emissive: new THREE.Color(ag.accentColor),
-        emissiveIntensity: 0.55,
+        emissiveIntensity: 0.65,
         roughness: 0.15,
-        metalness: 0.75,
-        clearcoat: 0.8,
-        clearcoatRoughness: 0.2,
+        metalness: 0.8,
+        clearcoat: 0.9,
+        clearcoatRoughness: 0.15,
       });
       const avatar = new THREE.Mesh(avatarGeo, avatarMat);
-      avatar.position.set(0, 2.15, 0.1);
+      avatar.position.set(0, 2.25, 0.15);
       avatar.castShadow = true;
       group.add(avatar);
 
-      // Gyroscopic Orbital Ring
-      const haloGeo = new THREE.TorusGeometry(0.88, 0.024, 16, 48);
+      // Multi-Layered Technical Holographic Orbit Ring
+      const haloGeo = new THREE.TorusGeometry(0.92, 0.024, 16, 48);
       const haloMat = new THREE.MeshBasicMaterial({
         color: new THREE.Color(ag.accentColor),
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.85,
       });
       const halo = new THREE.Mesh(haloGeo, haloMat);
-      halo.position.set(0, 2.15, 0.1);
+      halo.position.set(0, 2.25, 0.15);
       halo.rotation.x = Math.PI / 3;
       group.add(halo);
 
       // Workstation Point Light
-      const pLight = new THREE.PointLight(new THREE.Color(ag.accentColor), 1.2, 5.5);
-      pLight.position.set(0, 2.35, 0.1);
+      const pLight = new THREE.PointLight(new THREE.Color(ag.accentColor), 1.3, 6);
+      pLight.position.set(0, 2.45, 0.15);
       group.add(pLight);
 
-      // Invisible Raycasting Hitbox for Clicking
-      const hitGeo = new THREE.CylinderGeometry(1.65, 1.65, 3.6, 16);
+      // Raycasting Hitbox for Clicking
+      const hitGeo = new THREE.CylinderGeometry(1.75, 1.75, 3.8, 16);
       const hitMat = new THREE.MeshBasicMaterial({ visible: false });
       const hitbox = new THREE.Mesh(hitGeo, hitMat);
-      hitbox.position.y = 1.8;
+      hitbox.position.y = 1.9;
       hitbox.userData = { agent: ag };
       group.add(hitbox);
       interactiveObjects.push(hitbox);
@@ -560,19 +654,18 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
       agentMeshes.push({
         group,
         agent: ag,
-        beaconMesh: avatar,
-        haloMesh: halo,
-        deskLampLight: spotLight,
+        avatarMesh: avatar,
+        hudRingMesh: halo,
         pointLight: pLight,
         deskRimMesh: edgeStrip,
+        screenMesh: screen,
       });
     });
 
-    // 7. Dynamic Communication Energy Laser Arc
+    // 8. Dynamic Communication Energy Laser Arc
     let beamLine: THREE.Line | null = null;
-    let pulseParticles: THREE.Points | null = null;
 
-    // 8. Interaction & Camera Orbit Controls
+    // 9. Camera Orbit & Drag Controls
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
@@ -598,7 +691,7 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
         let radius = offset.length();
         let theta = Math.atan2(offset.x, offset.z) - deltaX * 0.005;
         let phi = Math.acos(Math.max(-1, Math.min(1, offset.y / radius))) + deltaY * 0.005;
-        phi = Math.max(0.22, Math.min(1.48, phi));
+        phi = Math.max(0.2, Math.min(1.48, phi));
 
         camera.position.x = currentLookAt.x + radius * Math.sin(phi) * Math.sin(theta);
         camera.position.y = currentLookAt.y + radius * Math.cos(phi);
@@ -664,7 +757,7 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
     container.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("resize", onResize);
 
-    // 9. Master 60FPS Cinematic Render Loop
+    // 10. Master 60FPS Cinematic Render Loop
     let animId: number;
     const clock = new THREE.Clock();
 
@@ -674,9 +767,9 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
 
       // Cinematic Drone Flythrough Orbit Mode
       if (isAutoDrifting && !isDragging) {
-        const driftRadius = 24;
-        const driftHeight = 16 + Math.sin(elapsed * 0.25) * 2.5;
-        const driftAngle = elapsed * 0.08;
+        const driftRadius = 25;
+        const driftHeight = 16.5 + Math.sin(elapsed * 0.22) * 2.8;
+        const driftAngle = elapsed * 0.085;
         cameraTargetRef.current.pos.set(
           Math.sin(driftAngle) * driftRadius,
           driftHeight,
@@ -692,17 +785,13 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
         camera.lookAt(currentLookAt);
       }
 
-      // Slow architectural drafting ring rotation
-      coreRing.rotation.z = elapsed * 0.05;
-      outerRing.rotation.z = -elapsed * 0.025;
-
-      // Rotate Central Holographic Molecular Apparatus
-      centralHoloGroup.rotation.y = elapsed * 0.25;
-      centralHoloGroup.position.y = 3.8 + Math.sin(elapsed * 1.4) * 0.12;
-      cageMesh.rotation.x = elapsed * 0.15;
-      innerCoreMesh.rotation.z = -elapsed * 0.35;
-      ring1.rotation.z = elapsed * 0.45;
-      ring2.rotation.x = -elapsed * 0.35;
+      // Animate Central Science Reactor
+      molecularCoreGroup.rotation.y = elapsed * 0.35;
+      molecularCoreGroup.position.y = 2.2 + Math.sin(elapsed * 1.5) * 0.12;
+      buckyMesh.rotation.x = elapsed * 0.2;
+      nucleusMesh.rotation.z = -elapsed * 0.45;
+      gyro1.rotation.z = elapsed * 0.5;
+      gyro2.rotation.x = -elapsed * 0.4;
 
       // Animate Sunlight Dust Motes
       const positions = particleGeo.attributes.position.array as Float32Array;
@@ -711,56 +800,59 @@ export function AerialAgentOffice({ isCompact = false }: AerialAgentOfficeProps)
         positions[i * 3 + 1] += particleSpeeds[i * 3 + 1];
         positions[i * 3 + 2] += particleSpeeds[i * 3 + 2];
 
-        // Wrap around bounding box
-        if (positions[i * 3 + 1] > 10) positions[i * 3 + 1] = 0.5;
-        if (positions[i * 3] > 14) positions[i * 3] = -14;
-        if (positions[i * 3] < -14) positions[i * 3] = 14;
-        if (positions[i * 3 + 2] > 14) positions[i * 3 + 2] = -14;
-        if (positions[i * 3 + 2] < -14) positions[i * 3 + 2] = 14;
+        if (positions[i * 3 + 1] > 11) positions[i * 3 + 1] = 0.5;
+        if (positions[i * 3] > 15) positions[i * 3] = -15;
+        if (positions[i * 3] < -15) positions[i * 3] = 15;
+        if (positions[i * 3 + 2] > 15) positions[i * 3 + 2] = -15;
+        if (positions[i * 3 + 2] < -15) positions[i * 3 + 2] = 15;
       }
       particleGeo.attributes.position.needsUpdate = true;
 
       // Animate Agent Workstations & Holograms
-      agentMeshes.forEach(({ agent, beaconMesh, haloMesh, pointLight, deskRimMesh }) => {
+      agentMeshes.forEach(({ agent, avatarMesh, hudRingMesh, pointLight, deskRimMesh, screenMesh }) => {
         const liveAgent = agents.find((a) => a.id === agent.id) || agent;
         const isWorking = liveAgent.state === "WORKING" || liveAgent.state === "VALIDATING";
         const isSelected = selectedAgentId === agent.id;
         const isHovered = hoveredAgent?.id === agent.id;
 
-        const speed = isWorking ? 3.2 : 0.85;
-        beaconMesh.rotation.y = elapsed * speed;
-        beaconMesh.rotation.x = Math.sin(elapsed * 1.6) * 0.12;
-        beaconMesh.position.y = 2.15 + Math.sin(elapsed * (isWorking ? 4.5 : 2.2)) * (isWorking ? 0.14 : 0.06);
+        const speed = isWorking ? 3.4 : 0.85;
+        avatarMesh.rotation.y = elapsed * speed;
+        avatarMesh.rotation.x = Math.sin(elapsed * 1.6) * 0.12;
+        avatarMesh.position.y = 2.25 + Math.sin(elapsed * (isWorking ? 4.5 : 2.2)) * (isWorking ? 0.15 : 0.07);
 
-        haloMesh.rotation.z = elapsed * (isWorking ? 2.8 : 0.9);
-        haloMesh.rotation.x = Math.PI / 3 + Math.sin(elapsed * 1.4) * 0.08;
+        hudRingMesh.rotation.z = elapsed * (isWorking ? 3.0 : 0.9);
+        hudRingMesh.rotation.x = Math.PI / 3 + Math.sin(elapsed * 1.4) * 0.08;
 
-        const mat = beaconMesh.material as THREE.MeshPhysicalMaterial;
+        const mat = avatarMesh.material as THREE.MeshPhysicalMaterial;
         const rimMat = deskRimMesh.material as THREE.MeshBasicMaterial;
+        const screenMat = screenMesh.material as THREE.MeshStandardMaterial;
 
         if (isWorking) {
-          mat.emissiveIntensity = 0.95 + Math.sin(elapsed * 8) * 0.35;
-          pointLight.intensity = 2.2;
+          mat.emissiveIntensity = 1.0 + Math.sin(elapsed * 8) * 0.4;
+          screenMat.emissiveIntensity = 0.95 + Math.sin(elapsed * 6) * 0.2;
+          pointLight.intensity = 2.4;
           rimMat.opacity = 1.0;
         } else if (isSelected || isHovered) {
-          mat.emissiveIntensity = 0.9;
-          pointLight.intensity = 1.8;
+          mat.emissiveIntensity = 0.95;
+          screenMat.emissiveIntensity = 0.85;
+          pointLight.intensity = 2.0;
           rimMat.opacity = 1.0;
         } else {
           mat.emissiveIntensity = 0.35;
-          pointLight.intensity = 0.75;
-          rimMat.opacity = 0.4;
+          screenMat.emissiveIntensity = 0.5;
+          pointLight.intensity = 0.8;
+          rimMat.opacity = 0.45;
         }
       });
 
-      // Render Communication Laser Arc
+      // Render Inter-Agent Communication Laser Arc
       if (activeCommunication) {
         const fromAg = agents.find((a) => a.role === activeCommunication.from);
         const toAg = agents.find((a) => a.role === activeCommunication.to);
         if (fromAg && toAg) {
-          const start = new THREE.Vector3(fromAg.workstationPos[0], 2.2, fromAg.workstationPos[2]);
-          const end = new THREE.Vector3(toAg.workstationPos[0], 2.2, toAg.workstationPos[2]);
-          const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5).add(new THREE.Vector3(0, 3.2, 0));
+          const start = new THREE.Vector3(fromAg.workstationPos[0], 2.3, fromAg.workstationPos[2]);
+          const end = new THREE.Vector3(toAg.workstationPos[0], 2.3, toAg.workstationPos[2]);
+          const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5).add(new THREE.Vector3(0, 3.4, 0));
 
           const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
           const points = curve.getPoints(36);
