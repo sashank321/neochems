@@ -164,9 +164,20 @@ export function TaskQueueSidebar() {
       </div>
 
       {/* Footer Info */}
-      <div className="p-3 border-t border-[#E0DCCF] bg-[#E8E4D6] flex items-center justify-between font-mono text-[10px] text-[#5A564C]">
-        <span>STATUS: {currentRun.status}</span>
-        <span className="font-bold text-[#E57D25]">{currentRun.progress}% COMPLETE</span>
+      <div className="p-3 border-t border-[#E0DCCF] bg-[#E8E4D6] flex flex-col space-y-1.5 font-mono text-[10px] text-[#5A564C]">
+        <div className="flex items-center justify-between">
+          <span>STATUS: {currentRun.status}</span>
+          <span className="font-bold text-[#E57D25]">{currentRun.progress}% COMPLETE</span>
+        </div>
+        {(currentRun.status === "RUNNING" || currentRun.status === "REPLANNING") && currentRun.phaseSecondsRemaining !== undefined && (
+          <div className="flex items-center justify-between text-[9px] text-[#0F0F0F] pt-1 border-t border-[#D5D0C2]">
+            <span>PHASE {currentRun.phaseIndex || 1}/6 (2M):</span>
+            <span className="font-bold text-[#E57D25]">
+              {String(Math.floor(currentRun.phaseSecondsRemaining / 60)).padStart(2, "0")}:
+              {String(currentRun.phaseSecondsRemaining % 60).padStart(2, "0")} REMAINING
+            </span>
+          </div>
+        )}
       </div>
     </aside>
   );

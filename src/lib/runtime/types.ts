@@ -127,12 +127,25 @@ export interface StructuredResult {
   completionTime: string;
 }
 
+export interface TelemetryLog {
+  id: string;
+  timestamp: string;
+  source: AgentRole;
+  message: string;
+  type: 'thought' | 'tool' | 'dispatch' | 'finding' | 'replan';
+}
+
 export interface AgentActivityStep {
   agentRole: AgentRole;
   agentName: string;
   action: string;
   timestamp: string;
-  status: 'STARTED' | 'IN_PROGRESS' | 'REPLANNING' | 'COMPLETED' | 'FLAGGED';
+  status: 'STARTED' | 'IN_PROGRESS' | 'VALIDATING' | 'REPLANNING' | 'COMPLETED' | 'FLAGGED';
+  thoughtChain?: string[];
+  currentThought?: string;
+  durationSeconds?: number;
+  elapsedSeconds?: number;
+  telemetryLogs?: TelemetryLog[];
 }
 
 export interface ChatMessage {
@@ -157,4 +170,8 @@ export interface RunState {
   activeAgents: AgentRole[];
   startedAt?: string;
   completedAt?: string;
+  phaseIndex?: number;
+  totalPhases?: number;
+  phaseSecondsRemaining?: number;
+  speedMultiplier?: number;
 }
